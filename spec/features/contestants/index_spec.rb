@@ -1,7 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Project, type: :model do
-
+describe "Contestants index page:" do
   before(:each) do
     # Challenges =================================================================
     @recycled_material_challenge = Challenge.create!(theme: "Recycled Material", project_budget: 1000)
@@ -25,27 +24,20 @@ RSpec.describe Project, type: :model do
     ContestantProject.create!(contestant_id: @erin.id, project_id: @boardfit.id)
   end
 
-  describe "validations" do
-    it {should validate_presence_of :name}
-    it {should validate_presence_of :material}
-  end
+  describe "When I visit the contestants index page ('/contestants')" do
+    it "I see a list of names of all the contestants And under each contestants name I see a list of the projects (names) that they've been on" do
+      visit "/contestants"
 
-  describe "relationships" do
-    it {should belong_to :challenge}
-    it {should have_many :contestant_projects}
-    it {should have_many(:contestants).through(:contestant_projects)}
-  end
-
-  describe '#average_years_experience' do
-    it 'returns 0 when there are no associated contestants' do
-      blank_project = Project.new
-      expect(blank_project.average_years_experience).to eq(0)
-    end
-
-    it 'calculates the average years of experience for associated contestants' do
-      @boardfit.contestants = [@jay, @gretchen]
-
-      expect(@boardfit.average_years_experience).to eq(12.5)
+      expect(page).to have_content("#{@jay.name}")
+      expect(page).to have_content("#{@gretchen.name}")
+      expect(page).to have_content("#{@kentaro.name}")
+      expect(page).to have_content("#{@erin.name}")
+      
+      expect(page).to have_content("#{@jay.projects.name}")
+      expect(page).to have_content("#{@gretchen.projects.name}")
+      expect(page).to have_content("#{@kentaro.projects.name}")
+      expect(page).to have_content("#{@erin.projects.name}")
+      
     end
   end
 end

@@ -1,7 +1,6 @@
 require "rails_helper"
 
-RSpec.describe Project, type: :model do
-
+describe "Projects show page:" do
   before(:each) do
     # Challenges =================================================================
     @recycled_material_challenge = Challenge.create!(theme: "Recycled Material", project_budget: 1000)
@@ -25,27 +24,26 @@ RSpec.describe Project, type: :model do
     ContestantProject.create!(contestant_id: @erin.id, project_id: @boardfit.id)
   end
 
-  describe "validations" do
-    it {should validate_presence_of :name}
-    it {should validate_presence_of :material}
-  end
-
-  describe "relationships" do
-    it {should belong_to :challenge}
-    it {should have_many :contestant_projects}
-    it {should have_many(:contestants).through(:contestant_projects)}
-  end
-
-  describe '#average_years_experience' do
-    it 'returns 0 when there are no associated contestants' do
-      blank_project = Project.new
-      expect(blank_project.average_years_experience).to eq(0)
+  describe "When I visit a project's show page ('/projects/:id')" do
+    it "I see that project's name and material And I also see the theme of the challenge that this project belongs to." do
+      visit "/projects/#{@lit_fit.id}"
+      
+      expect(page).to have_content("#{@lit_fit.name}")
+      expect(page).to have_content("#{@lit_fit.material}")
+      expect(page).to have_content("#{@lit_fit.challenge.theme}")
     end
-
-    it 'calculates the average years of experience for associated contestants' do
-      @boardfit.contestants = [@jay, @gretchen]
-
-      expect(@boardfit.average_years_experience).to eq(12.5)
+    
+    it "I see a count of the number of contestants on this project" do
+      visit "/projects/#{@news_chic.id}"
+      
+      expect(page).to have_content("Number of Contestants: #{@news_chic_count}")
     end
+    
+    it "I see the average years of experience for the contestants that worked on that project" do
+      visit "/projects/#{@news_chic.id}"
+
+      expect(page).to have_content("Average Contestant Experience: #{@news_chic.average_years_experience}")
+    end
+    
   end
 end
